@@ -6,7 +6,11 @@ const { getEntries, createEntry, getEntry } = require('../controllers/entries.co
 const router = Router();
 
 router.get('/entries', getEntries);
-router.get('/entries/:id', getEntry);
+router.get('/entries/:id', [
+    check('id', 'ID is required').not().isEmpty(),
+    check('id', 'Invalid ID').isNumeric(),
+    validateFields
+], getEntry);
 
 router.post('/entries', [
     check('title', 'Title is required').not().isEmpty(),

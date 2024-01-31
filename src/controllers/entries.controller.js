@@ -12,8 +12,22 @@ const getEntries = async (req, res) => {
     }
 };
 
-const getEntry = (req, res) => {
-    res.json('Getting a entry by ID');
+const getEntry = async (req, res) => {
+    
+    try {
+        const { id } = req.params;
+
+        const [response] = await pool.query("SELECT * FROM entries WHERE id = ?", [id]);
+        const entry = response[0];
+
+        if(!entry) return res.status(404).json({ status: 'error', message: 'Entry not found' });
+
+        res.status(200).json({ status: 'success', data: entry });
+
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: 'Something goes wrong' });
+    }
+
 };
 
 const createEntry = async (req, res) => {
