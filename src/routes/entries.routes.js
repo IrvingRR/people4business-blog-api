@@ -6,6 +6,7 @@ const { getEntries, createEntry, getEntry } = require('../controllers/entries.co
 const router = Router();
 
 router.get('/entries', getEntries);
+
 router.get('/entries/:id', [
     check('id', 'ID is required').not().isEmpty(),
     check('id', 'Invalid ID').isNumeric(),

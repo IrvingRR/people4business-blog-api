@@ -2,8 +2,14 @@ const { pool } = require('../db.js');
 
 const getEntries = async (req, res) => {
     try {
+        const { term, value } = req.query;
 
-        const [entries] = await pool.query("SELECT * FROM entries");
+        if(term && value) {
+            const [entries] = await pool.query(`SELECT * FROM entries WHERE ${term} LIKE "%${value}%"`);
+            return res.status(200).json({ status: "success", data: entries, });
+        }
+
+        const [entries] = await pool.query(`SELECT * FROM entries`);
         res.status(200).json({ status: "success", data: entries, });
 
     } catch (error) {
