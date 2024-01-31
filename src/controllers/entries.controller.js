@@ -40,7 +40,10 @@ const createEntry = async (req, res) => {
     try {
 
         const { title, author, content, publication_date } = req.body;
-        const [newEntry] = await pool.query("INSERT INTO entries (title, author, content, publication_date) VALUES (?,?,?,?)", [title, author, content, publication_date]);
+        const [newEntry] = await pool.query(
+            "INSERT INTO entries (title, author, content, publication_date) VALUES (?,?,?,?)",
+            [title, author, content, publication_date]
+        );
 
         res.status(201).json({ status: 'success', data: { id: newEntry.insertId, ...req.body } });
 
@@ -49,4 +52,34 @@ const createEntry = async (req, res) => {
     }
 };
 
-module.exports = { getEntries, createEntry, getEntry };
+const editEntry = async (req, res) => {
+    const { id } = req.params;
+    const { title, author, content, publication_date } = req.body;
+
+    const [entryFound] = await pool.query("SELECT * FROM entries WHERE id = ?", [id]);
+    const entry = entryFound[0];
+
+    if(!entry) return res.status(404).json({ status: 'error', message: 'Entry not found' });
+
+    await pool.query(
+        "UPDATE entries SET title = ?, author = ?, content = ?, publication_date = ? WHERE id = ?",
+        [title, author, content, publication_date, id]
+    );
+        
+    res.status(200).json({ status: 'success', data: { id, ...req.body } });
+};
+
+const deleteEntry = async (req, res) => {
+    const { id } = req.params;
+
+    const [entryFound] = await pool.query("SELECT * FROM entries WHERE id = ?", [id]);
+    const entry = entryFound[0];
+
+    if(!entry) return res.status(404).json({ status: 'error', message: 'Entry not found' });
+
+    await pool.query("DELETE FROM entries WHERE id = ?", [id]);
+        
+    res.status(200).json({ status: 'success', message: 'Entry deleted' });
+};
+
+module.exports = { getEntries, getEntry, createEntry, editEntry, deleteEntry };
