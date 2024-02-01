@@ -16,7 +16,6 @@ router.get('/entries/:id', [
 router.post('/entries', [
     check('title', 'Title is required').not().isEmpty(),
     check('author', 'Author is required').not().isEmpty(),
-    check('publication_date', 'Publication date is required').not().isEmpty(),
     check('content', 'Content is required').not().isEmpty(),
     validateFields
 ], createEntry);
@@ -26,7 +25,6 @@ router.put('/entries/:id', [
     check('id', 'Invalid ID').isNumeric(),
     check('title', 'Title is required').not().isEmpty(),
     check('author', 'Author is required').not().isEmpty(),
-    check('publication_date', 'Publication date is required').not().isEmpty(),
     check('content', 'Content is required').not().isEmpty(),
     validateFields
 ], editEntry);

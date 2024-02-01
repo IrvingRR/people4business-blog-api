@@ -31,7 +31,7 @@ const getEntry = async (req, res) => {
         res.status(200).json({ status: 'success', data: entry });
 
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Something goes wrong' });
+        res.status(500).json({ status: 'error', message: 'Something goes wrong getting entries' });
     }
 
 };
@@ -39,47 +39,58 @@ const getEntry = async (req, res) => {
 const createEntry = async (req, res) => {
     try {
 
-        const { title, author, content, publication_date } = req.body;
+        const { title, author, content } = req.body;
+        const currentDate = new Date().toLocaleDateString();
+
         const [newEntry] = await pool.query(
             "INSERT INTO entries (title, author, content, publication_date) VALUES (?,?,?,?)",
-            [title, author, content, publication_date]
+            [title, author, content, currentDate]
         );
 
-        res.status(201).json({ status: 'success', data: { id: newEntry.insertId, ...req.body } });
+        res.status(201).json({ status: 'success', data: { id: newEntry.insertId, ...req.body, publication_date: currentDate } });
 
     } catch (error) {
-        return res.status(500).json({ status: 'error', message: 'Something goes wrong' });
+        return res.status(500).json({ status: 'error', message: 'Something goes wrong creating the entry' });
     }
 };
 
 const editEntry = async (req, res) => {
-    const { id } = req.params;
-    const { title, author, content, publication_date } = req.body;
-
-    const [entryFound] = await pool.query("SELECT * FROM entries WHERE id = ?", [id]);
-    const entry = entryFound[0];
-
-    if(!entry) return res.status(404).json({ status: 'error', message: 'Entry not found' });
-
-    await pool.query(
-        "UPDATE entries SET title = ?, author = ?, content = ?, publication_date = ? WHERE id = ?",
-        [title, author, content, publication_date, id]
-    );
+    try {
+        const { id } = req.params;
+        const { title, author, content } = req.body;
+    
+        const [entryFound] = await pool.query("SELECT * FROM entries WHERE id = ?", [id]);
+        const entry = entryFound[0];
+    
+        if(!entry) return res.status(404).json({ status: 'error', message: 'Entry not found' });
+    
+        await pool.query(
+            "UPDATE entries SET title = ?, author = ?, content = ? WHERE id = ?",
+            [title, author, content, id]
+        );
+        res.status(200).json({ status: 'success', data: { id: parseInt(id), publication_date: entry.publication_date, ...req.body } });
         
-    res.status(200).json({ status: 'success', data: { id, ...req.body } });
+    } catch (error) {
+        return res.status(500).json({ status: 'error', message: 'Something goes wrong updating the entry' });
+    }
 };
 
 const deleteEntry = async (req, res) => {
-    const { id } = req.params;
-
-    const [entryFound] = await pool.query("SELECT * FROM entries WHERE id = ?", [id]);
-    const entry = entryFound[0];
-
-    if(!entry) return res.status(404).json({ status: 'error', message: 'Entry not found' });
-
-    await pool.query("DELETE FROM entries WHERE id = ?", [id]);
+    try {
+        const { id } = req.params;
+    
+        const [entryFound] = await pool.query("SELECT * FROM entries WHERE id = ?", [id]);
+        const entry = entryFound[0];
+    
+        if(!entry) return res.status(404).json({ status: 'error', message: 'Entry not found' });
+    
+        await pool.query("DELETE FROM entries WHERE id = ?", [id]);
+            
+        res.status(200).json({ status: 'success', message: 'Entry deleted' });
         
-    res.status(200).json({ status: 'success', message: 'Entry deleted' });
+    } catch (error) {
+        return res.status(500).json({ status: 'error', message: 'Something goes wrong deleting the entry' });
+    }
 };
 
 module.exports = { getEntries, getEntry, createEntry, editEntry, deleteEntry };
