@@ -41,14 +41,12 @@ const getEntry = async (req, res) => {
 const createEntry = async (req, res) => {
     try {
 
-        const idGenerated = generateUniqueId();
         const { title, author, content } = req.body;
         const currentDate = new Date().toLocaleDateString();
-        console.log('Id generated...:', idGenerated);
 
         const [newEntry] = await pool.query(
-            "INSERT INTO entries (id, title, author, content, publication_date) VALUES (?,?,?,?,?)",
-            [idGenerated, title, author, content, currentDate]
+            "INSERT INTO entries (title, author, content, publication_date) VALUES (?,?,?,?)",
+            [title, author, content, currentDate]
         );
 
         res.status(201).json({ status: 'success', data: { id: newEntry.insertId, ...req.body, publication_date: currentDate } });
