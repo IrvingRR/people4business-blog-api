@@ -44,7 +44,7 @@ const createEntry = async (req, res) => {
         const idGenerated = generateUniqueId();
         const { title, author, content } = req.body;
         const currentDate = new Date().toLocaleDateString();
-        console.log('Id generated:', idGenerated);
+        console.log('Id generated...:', idGenerated);
 
         const [newEntry] = await pool.query(
             "INSERT INTO entries (id, title, author, content, publication_date) VALUES (?,?,?,?,?)",
