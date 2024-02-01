@@ -1,5 +1,4 @@
 const { pool } = require('../db.js');
-const generateUniqueId = require('generate-unique-id');
 
 const getEntries = async (req, res) => {
     try {
