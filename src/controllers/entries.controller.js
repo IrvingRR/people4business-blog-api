@@ -14,7 +14,7 @@ const getEntries = async (req, res) => {
 
     } catch (error) {
         console.log('Error:', error);
-        return res.status(500).json({ status: 'error', message: 'Something goes wrong' });
+        return res.status(500).json({ status: 'error', message: 'Something goes wrong getting entries' });
     }
 };
 
@@ -31,7 +31,8 @@ const getEntry = async (req, res) => {
         res.status(200).json({ status: 'success', data: entry });
 
     } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Something goes wrong getting entries' });
+        console.log('Error:', error);
+        res.status(500).json({ status: 'error', message: 'Something goes wrong getting entry' });
     }
 
 };
@@ -50,6 +51,7 @@ const createEntry = async (req, res) => {
         res.status(201).json({ status: 'success', data: { id: newEntry.insertId, ...req.body, publication_date: currentDate } });
 
     } catch (error) {
+        console.log('Error:', error);
         return res.status(500).json({ status: 'error', message: 'Something goes wrong creating the entry' });
     }
 };
@@ -71,6 +73,7 @@ const editEntry = async (req, res) => {
         res.status(200).json({ status: 'success', data: { id: parseInt(id), publication_date: entry.publication_date, ...req.body } });
         
     } catch (error) {
+        console.log('Error:', error);
         return res.status(500).json({ status: 'error', message: 'Something goes wrong updating the entry' });
     }
 };
@@ -89,6 +92,7 @@ const deleteEntry = async (req, res) => {
         res.status(200).json({ status: 'success', message: 'Entry deleted' });
         
     } catch (error) {
+        console.log('Error:', error);
         return res.status(500).json({ status: 'error', message: 'Something goes wrong deleting the entry' });
     }
 };
